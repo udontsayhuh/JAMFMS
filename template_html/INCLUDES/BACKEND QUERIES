@@ -1,0 +1,74 @@
+create table jamsfms_r_customer (
+    customerid int PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    fname varchar(50) not null,
+	lname varchar(50) not null,
+    job varchar(50) not null,
+    email varchar(50) not null,
+    tel_no varchar(50) not null,
+    companyname varchar(50) not null,
+    off_add varchar(50) not null,
+     TIN varchar(50) not null,
+    company_tel varchar(50) not null
+                     
+                  
+)
+
+
+create table jamsfms_r_stakeholder (
+stkhid int(8) zerofill PRIMARY KEY AUTO_INCREMENT not null,
+ stkh_name varchar(150) not null,
+    stkh_address varchar(200) not null,
+    stkh_contact varchar(200) not null,
+    stkh_category bit not null,
+    stkh_percent numeric not null,
+    stkh_status bit not null DEFAULT 0
+    
+)
+
+create TABLE jamsfms_r_prod_category (
+prod_cat_id INT PRIMARY KEY AUTO_INCREMENT not null,
+    prod_cat_name varchar(50) not null,
+prod_cat_desc varchar(150) not null,
+    prod_cat_stat bit not null default 0
+)
+
+create table jamsfms_r_product (
+prod_id int(8) ZEROFILL AUTO_INCREMENT not null,
+   prod_name varchar(50) not null,
+   prod_desc varchar(150) not null,
+   fk_prodcat int not null,
+   prod_machinecost numeric not null,
+    prod_materialcost numeric not null,
+    prod_unitmeasure varchar(50) not null,
+    prod_status bit not null DEFAULT 0
+    
+)
+
+create table jamsfms_r_product (
+prod_id int(8) ZEROFILL PRIMARY key AUTO_INCREMENT not null,
+   prod_name varchar(50) not null,
+   prod_desc varchar(150) not null,
+   prod_machinecost numeric not null,
+    prod_materialcost numeric not null,
+    prod_unitmeasure varchar(50) not null,
+    prod_status bit not null DEFAULT 0,
+     fk_prodcat int not null,
+    FOREIGN KEY (fk_prodcat) REFERENCES jamsfms_r_prod_category(prod_cat_id)
+    
+    
+)
+
+create TABLE jamsfms_r_sales (
+so_id int(8) ZEROFILL PRIMARY key AUTO_INCREMENT not null,
+po_num int(8) not null,
+   fk_prod_id int(8) unsigned ZEROFILL not null,
+    so_qty int not null,
+    deldate date not null,
+    FOREIGN key (fk_prod_id) REFERENCES jamsfms_r_product(prod_id)
+)
+
+create table jamsfms_r_stakeholder_type (
+st_type_id int(8) unsigned zerofill PRIMARY key AUTO_INCREMENT not null,
+    st_type_name varchar(50) not null
+)
+
