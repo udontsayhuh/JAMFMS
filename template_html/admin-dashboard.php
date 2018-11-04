@@ -1,24 +1,5 @@
 <?php
-
-session_start();
-$username = $_SESSION['username'];
-//$username = $_POST['username'];
-
-$connect = mysqli_connect('localhost', 'root', '') or die('Database could not connect');
-$select = mysqli_select_db( $connect, 'jamfms') or die('Database could not select');
-
-$selectname = "SELECT * from jamfms_r_useraccount where username = '$username'";
-$nameresult = mysqli_query($connect, $selectname) or die('Bad query: $sql'); 
-
-while ($row = mysqli_fetch_assoc($nameresult) ) {
-    $fname = $row['fname'];
-    $mname = $row['mname'];
-    $lname = $row['lname'];
-    $name = $fname .' '. $mname .' '.$lname;
-}
-
-
-
+include 'INCLUDES/userdetails.php';
  ?>
 
 
@@ -35,8 +16,16 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 	<meta content="" name="author" />
 	
 	<!-- ================== BEGIN BASE CSS STYLE ================== -->
-	<?php include 'INCLUDES/css.php'; ?>
-
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+	<link href="../assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+	<link href="../assets/plugins/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="../assets/plugins/font-awesome/5.0/css/fontawesome-all.min.css" rel="stylesheet" />
+	<link href="../assets/plugins/animate/animate.min.css" rel="stylesheet" />
+	<link href="../assets/css/default/style.min.css" rel="stylesheet" />
+	<link href="../assets/css/default/style-responsive.min.css" rel="stylesheet" />
+	<link href="../assets/css/default/theme/default.css" rel="stylesheet" id="theme" />
+	<link href="../assets/js/sweetalert/sweetalert.css" type="text/css" rel="stylesheet" media="screen,projection">
+	<script src="../assets/js/sweetalert/sweetalert.min.js"></script>
 	<!-- ================== END BASE CSS STYLE ================== -->
 	
 	<!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
@@ -45,6 +34,7 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
     <link href="../assets/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 	<!-- ================== END PAGE LEVEL STYLE ================== -->
 	
+	<script src="../assets/plugins/pace/pace.min.js"></script>
 
 </head>
 <body>
@@ -69,98 +59,18 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 			
 			<!-- begin header-nav -->
 			<ul class="navbar-nav navbar-right">
-				<li>
-					<form class="navbar-form">
-						<div class="form-group">
-							<input type="text" class="form-control" placeholder="Enter keyword" />
-							<button type="submit" class="btn btn-search"><i class="fa fa-search"></i></button>
-						</div>
-					</form>
-				</li>
-				<li class="dropdown">
-					<a href="javascript:;" data-toggle="dropdown" class="dropdown-toggle f-s-14">
-						<i class="fa fa-bell"></i>
-						<span class="label">5</span>
-					</a>
-					<ul class="dropdown-menu media-list dropdown-menu-right">
-						<li class="dropdown-header">NOTIFICATIONS (5)</li>
-						<li class="media">
-							<a href="javascript:;">
-								<div class="media-left">
-									<i class="fa fa-bug media-object bg-silver-darker"></i>
-								</div>
-								<div class="media-body">
-									<h6 class="media-heading">Server Error Reports <i class="fa fa-exclamation-circle text-danger"></i></h6>
-									<div class="text-muted f-s-11">3 minutes ago</div>
-								</div>
-							</a>
-						</li>
-						<li class="media">
-							<a href="javascript:;">
-								<div class="media-left">
-									<img src="../assets/img/user/user-1.jpg" class="media-object" alt="" />
-									<i class="fab fa-facebook-messenger text-primary media-object-icon"></i>
-								</div>
-								<div class="media-body">
-									<h6 class="media-heading">John Smith</h6>
-									<p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
-									<div class="text-muted f-s-11">25 minutes ago</div>
-								</div>
-							</a>
-						</li>
-						<li class="media">
-							<a href="javascript:;">
-								<div class="media-left">
-									<img src="../assets/img/user/user-2.jpg" class="media-object" alt="" />
-									<i class="fab fa-facebook-messenger text-primary media-object-icon"></i>
-								</div>
-								<div class="media-body">
-									<h6 class="media-heading">Olivia</h6>
-									<p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
-									<div class="text-muted f-s-11">35 minutes ago</div>
-								</div>
-							</a>
-						</li>
-						<li class="media">
-							<a href="javascript:;">
-								<div class="media-left">
-									<i class="fa fa-plus media-object bg-silver-darker"></i>
-								</div>
-								<div class="media-body">
-									<h6 class="media-heading"> New User Registered</h6>
-									<div class="text-muted f-s-11">1 hour ago</div>
-								</div>
-							</a>
-						</li>
-						<li class="media">
-							<a href="javascript:;">
-								<div class="media-left">
-									<i class="fa fa-envelope media-object bg-silver-darker"></i>
-									<i class="fab fa-google text-warning media-object-icon f-s-14"></i>
-								</div>
-								<div class="media-body">
-									<h6 class="media-heading"> New Email From John</h6>
-									<div class="text-muted f-s-11">2 hour ago</div>
-								</div>
-							</a>
-						</li>
-						<li class="dropdown-footer text-center">
-							<a href="javascript:;">View more</a>
-						</li>
-					</ul>
-				</li>
 				<li class="dropdown navbar-user">
 					<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 						<img src="../assets/img/user/user-13.jpg" alt="" /> 
-						<span class="d-none d-md-inline">Adam Schwartz</span> <b class="caret"></b>
+						<span class="d-none d-md-inline"><?php echo $name; ?></span> <b class="caret"></b>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right">
-						<a href="javascript:;" class="dropdown-item">Edit Profile</a>
-						<a href="javascript:;" class="dropdown-item"><span class="badge badge-danger pull-right">2</span> Inbox</a>
-						<a href="javascript:;" class="dropdown-item">Calendar</a>
-						<a href="javascript:;" class="dropdown-item">Setting</a>
+						<button id="resetpass" data-toggle="modal" data-target="#modal-message" class="dropdown-item">Reset Password</button>
 						<div class="dropdown-divider"></div>
-						<a href="javascript:;" class="dropdown-item">Log Out</a>
+						<form action="" method="POST">
+						<button type="submit"  name="logout"  class="dropdown-item">Log Out</button>
+						<input type="hidden" name="transtype" value="Log out">
+						</form>
 					</div>
 				</li>
 			</ul>
@@ -174,7 +84,27 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 			<div data-scrollbar="true" data-height="100%">
 				<!-- begin sidebar user -->
 				<ul class="nav">
-				<?php include 'INCLUDES/sidebar-name.php' ?>
+				<li class="nav-profile">
+						<a href="javascript:;" data-toggle="nav-profile">
+							<div class="cover with-shadow"></div>
+							<div class="image">
+								<img src="../assets/img/user/user-13.jpg" alt="" />
+							</div>
+							<div class="info">
+								<b class="caret pull-right"></b>
+							<?php echo $name; ?>
+								<small><?php echo $userrole; ?></small>
+								<input type="hidden" id="u_id" value="<?php echo $uid; ?>"/>
+							</div>
+						</a>
+					</li>
+					<li>
+						<ul class="nav nav-profile">
+                            <li><a href="javascript:;"><i class="fa fa-cog"></i> Settings</a></li>
+                            <li><a href="javascript:;"><i class="fa fa-pencil-alt"></i> Send Feedback</a></li>
+                            <li><a href="javascript:;"><i class="fa fa-question-circle"></i> Helps</a></li>
+                        </ul>
+					</li>
 				</ul>
 				<!-- end sidebar user -->
 				<!-- begin sidebar nav -->
@@ -182,6 +112,7 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 					<li class="nav-header">Navigation</li>
 					<li class="active"><a href="admin-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
 					<li><a href="admin-accountsetup.php"><i class="fas fa-users"></i> <span>Account Management</span></a></li>
+					<li><a href="admin-audit-trail.php"><i class="fas fa-book"></i> <span>Audit Trail</span></a></li>
 					
 					
 					
@@ -362,11 +293,69 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
             </div>
         </div>
         <!-- end theme-panel -->
+        <div class="modal modal-message fade" id="modal-message">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title">Reset Password</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										</div>
+										<div class="modal-body">
+			                                 		<div class="panel panel-inverse" data-sortable-id="form-plugins-1">
+                    	<!-- begin panel-heading -->
+                        <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-redo"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                            </div>
+                            <h4 class="panel-title">Configure fields to update password</h4>
+                        </div>
+                    	<!-- end panel-heading -->
+                    	<!-- begin panel-body -->
+                        <div class="panel-body panel-form">
+                            <form class="form-horizontal form-bordered">
+								<!--<div class="form-group row">
+									<label class="col-md-4 col-form-label">Current Password</label>
+									<div class="col-md-8">
+									    <input id="curr" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+							-->
+								<div class="form-group row">
+									<label class="col-md-4 col-form-label">New Password</label>
+									<div class="col-md-8">
+									    <input id="new" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+								<div class="form-group row">
+									<label class="col-md-4 col-form-label">Retype Password</label>
+									<div class="col-md-8">
+									    <input id="retype" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+								<div id="error"  style="display: none;"  class="alert alert-danger fade show">Passwords do not match!</div>
+								<div id="match"  style="display: none;"  class="alert alert-lime fade show">Passwords match!</div>
+								<div id="fillin"  style="display: none;"  class="alert alert-danger fade show">You did not made any entries!</div>
+							</form>
+                        </div>
+                        <!-- end panel-body -->
+                    </div>
+										</div>
+										<div class="modal-footer">
+											<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+											<button id="pass_btn" class="btn btn-primary">Change Password</button>
+										</div>
+									</div>
+								</div>
+							</div>
 		
 		<!-- begin scroll to top btn -->
 		<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
 		<!-- end scroll to top btn -->
 	</div>
+
 	<!-- end page container -->
 	<script src="../assets/plugins/jquery/jquery-3.2.1.min.js"></script>
 	<script src="../assets/plugins/jquery-ui/jquery-ui.min.js"></script>
@@ -390,12 +379,106 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 	<script src="../assets/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 	<script src="../assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="../assets/js/demo/dashboard.min.js"></script>
+	<script src="../assets/js/demo/ui-modal-notification.demo.min.js"></script>
 	<script>
 		$(document).ready(function() {
 			App.init();
 			Dashboard.init();
+			Notification.init();
 		});
 	</script>
+	<script type="text/javascript">
+		
+		$( 'input[id=retype]').keyup(function(){
+			
+			var pass1 = document.getElementById('new').value;
+			var pass2 = document.getElementById('retype').value;
+			if( pass1 != pass2)
+				{$("#error").show(); 
+				$("#match").hide();
+				$("#fillin").hide();
+			}
+			if ( pass1 == pass2){$("#match").show(); $("#error").hide(); $("#fillin").hide();}
+			
+		});
+	</script>
+	<script type="text/javascript">
+        $('#pass_btn').click(function(e){
+            e.preventDefault();
+
+            
+           // var currpass = document.getElementById('curr').value;
+            var newpass = document.getElementById('new').value;
+            var useraydi = document.getElementById('u_id').value;
+           	
+           	if(newpass == "" || useraydi == ""){
+           		$("#fillin").show();
+           	}
+           	else{
+           		$("#fillin").hide();
+			   swal({
+                        title: "Update password?",
+                        text: "New password will be saved.",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#b05544',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: "No",
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+
+                },
+                function(isConfirm){
+                    if (isConfirm) {
+                    	 
+
+                      
+                        $.ajax({
+                                    type: 'POST',
+                                    url: 'INCLUDES/updatepass.php',
+                                    async: false,
+                                    data: {
+                                        
+                                        _id: useraydi,
+                                        _pass: newpass
+
+                                    },
+                                    success: function(data) {
+                                        
+
+                                        swal("Password is changed! ", "Entries are saved.", "success");
+                                        
+                                        setTimeout(function() 
+                                        {
+                                            window.location = 'admin-dashboard.php';
+                                            //document.getElementById('add-regular').click();
+                                        },3000);
+                                    },
+                                    error: function(data) {
+                                       
+                                        swal("Error", "Something is wrong.", "error");
+                                    }
+
+                                }); 
+
+                        
+                            	
+   		 			
+                    
+
+                    } 
+                    else
+                    {
+                        swal("Cancelled", "", "error");
+                    }
+                });
+                
+             
+           }
+            
+
+        });
+    </script>
 	
 
 </body>

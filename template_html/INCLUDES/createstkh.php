@@ -12,7 +12,7 @@
 	$insertquery = "INSERT INTO `jamsfms_r_stakeholder`(`stkh_name`, `stkh_address`, `stkh_contact`, `stkh_percent`, `fk_st_type_id`) VALUES ('$insert_stname', '$insert_staddress', '$insert_stcontact', $insert_stpercent, $insert_stcat)";
 
 	mysqli_query($connect, $insertquery);
-	echo "INSERT INTO `INSERT INTO `jamsfms_r_stakeholder`(`stkh_name`, `stkh_address`, `stkh_contact`, `stkh_percent`, `fk_st_type_id`) VALUES ('$insert_stname', '$insert_staddress', '$insert_stcontact', $insert_stpercent, $insert_stcat)";
+	echo "INSERT INTO `jamsfms_r_stakeholder`(`stkh_name`, `stkh_address`, `stkh_contact`, `stkh_percent`, `fk_st_type_id`) VALUES ('$insert_stname', '$insert_staddress', '$insert_stcontact', $insert_stpercent, $insert_stcat)";
 	
 	//echo $insert_pass;
 ?>

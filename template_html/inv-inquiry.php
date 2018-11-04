@@ -1,6 +1,5 @@
 <?php
 include 'INCLUDES/userdetails.php';
-
 ?>
 
 <!DOCTYPE html>
@@ -10,7 +9,7 @@ include 'INCLUDES/userdetails.php';
 <!--<![endif]-->
 <head>
 	<meta charset="utf-8" />
-	<title>Sales Orders | Report</title>
+	<title>Color Admin | Managed Tables - Extension Combination</title>
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
 	<meta content="" name="description" />
 	<meta content="" name="author" />
@@ -38,8 +37,7 @@ include 'INCLUDES/userdetails.php';
 	<link href="../assets/plugins/DataTables/extensions/Select/css/select.bootstrap.min.css" rel="stylesheet" />
 	<link href="../assets/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 	<!-- ================== END PAGE LEVEL STYLE ================== -->
-	<link href="../assets/plugins/switchery/switchery.min.css" rel="stylesheet" />
-	<link href="../assets/plugins/powerange/powerange.min.css" rel="stylesheet" />
+	
 	<!-- ================== BEGIN BASE JS ================== -->
 	<script src="../assets/plugins/pace/pace.min.js"></script>
 	<!-- ================== END BASE JS ================== -->
@@ -102,6 +100,8 @@ include 'INCLUDES/userdetails.php';
 								<b class="caret pull-right"></b>
 							<?php echo $name; ?>
 								<small><?php echo $userrole; ?></small>
+								<input type="hidden" id="u_id" value="<?php echo $uid; ?>"/>
+
 							</div>
 						</a>
 					</li>
@@ -118,8 +118,8 @@ include 'INCLUDES/userdetails.php';
 				<!-- begin sidebar nav -->
 				<ul class="nav">
 					<li class="nav-header">Navigation</li>
-					<li><a href="ac-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
-					<li class="active"><a href="ac-sales.php"><i class="fas fa-users"></i> <span>Sales Management</span></a></li>
+					<li><a href="inv-home.php"><i class="fas fa-question-home"></i> <span>Home</span></a></li>
+					<li class="active"><a href="inv-inquiry.php"><i class="fas fa-users"></i> <span>PO Inquiry</span></a></li>
 			        <!-- end sidebar minify button -->
 				</ul>
 				<!-- end sidebar nav -->
@@ -140,20 +140,17 @@ include 'INCLUDES/userdetails.php';
 			</ol>
 			<!-- end breadcrumb -->
 			<!-- begin page-header -->
-			<h1 class="page-header">Sales Management</h1>
+			<h1 class="page-header">Investment Inquiry Page</h1>
 			<!-- end page-header -->
 			
 			<!-- begin row -->
 			<div class="row">
 			    <!-- begin col-2 -->
 			    <div class="col-lg-2">
-			        <h5>The Sales Management does the following features:</h5>
+			        <h5>The Inquiry Page does the following features:</h5>
                     <ul class="p-l-25 m-b-15">
-                        <li>Create Sales Order</li>
-                        <li>View Sales</li>
-                        <li>Update Sales Order</li>
-                        <li>Filter Table</li>
-                        <li>Print Sales Report</li>
+                        <li>View Investment Status</li>
+                        <li>Print Investment Report</li>
                         
                     
                     </ul>
@@ -170,34 +167,15 @@ include 'INCLUDES/userdetails.php';
                                 <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
                                 <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
                             </div>
-                            <h4 class="panel-title">Sales Orders</h4>
+                            <h4 class="panel-title">Purchase Orders</h4>
                         </div>
                         <!-- end panel-heading -->
                         <!-- begin panel-body -->
-                        <div style="padding: 20px;"><button type="button" class="btn btn-lime" data-toggle="modal" data-target="#modal-dialog"><i class="fas fa-plus"></i> Create New Sales Order</button></div>
-                        <div class="panel-body">
-
-                            <table id="data-table-combine" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                    	<th>SO No.</th>
-                                        <th>Customer</th>
-                                        <th>Date of Delivery</th>
-                                        <th>Action</th>
-
-                                    </tr>
-                                </thead>
-                                <tfoot>
-                                    <tr>
-                                        <th>SO No.</th>
-                                        <th>Customer</th>
-                                        <th>Date of Delivery</th>
-                                        <th>Action</th>
-                                    </tr>
-                                 </tfoot>
-                                <tbody>
-                                   <?php 
-                                                $tablesql = "SELECT * FROM `jamsfms_r_sales` as a inner join jamsfms_r_product as B on A.fk_prod_id = B.prod_id order by A.so_id desc";
+                        <div style="padding: 40px;">
+                        	<form id="formsub" action="cu-inquiry.php" method="POST">
+                        <table>
+                        	 <?php 
+                                                $tablesql = "SELECT * FROM `jamsfms_r_sales` order by so_id desc";
                                                 $tableresult = mysqli_query($connect, $tablesql) or die("Bad query: $sql");
 
                                                 while ($row = mysqli_fetch_assoc($tableresult)) {
@@ -206,99 +184,35 @@ include 'INCLUDES/userdetails.php';
                                                     $so = $row['po_num'];
                                                     $qty = $row['so_qty'];
                                                     $ddate = $row['deldate'];
-                                                    $product = $row['prod_name'];
 
-                                                
+                                                }
                                                ?>
-                                   <tr>
-                                       <td><?php echo 'SO-'. $so ?></td>
-                                       <td><?php echo 'CC-'. $cust; ?></td>
-                                       <td><?php echo $ddate; ?></td>
-                                       <td>
-                                           <center>
-                                               <button data-toggle="modal" class="btn btn-primary" href="#edit<?php echo $ID; ?>" ><i class='fa fa-cogs'></i></button>
-                                               
-                                           </center>
-                                       </td>
-                                   </tr>
-
-                                   			<div class="modal fade" id="edit<?php echo $ID; ?>">
-																<div class="modal-dialog">
-																	<div class="modal-content">
-																		<div class="modal-header">
-																			<h4 class="modal-title">Sales Order</h4>
-																			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-																		</div>
-												<div class="modal-body">
-															
-								                                <?php echo '<p class="m-b-25">UPDATE&nbsp&nbsp&nbsp<input type="checkbox" value="'.$ID.'" id="toggle" data-render="switchery" data-theme="default" /></p> '; ?>
-			                                
-			                            </p>
-								                                   
-								                                  <div class="form-group">
-								                                  	<input type="text" style="display: none;" value="<?php echo $ID; ?>" required class="form-control" name="aydi" id="aydi">
-								                                    <label>Sales Order</label>
-								                                   <input disabled type="text" value="SO-<?php echo $so; ?>" required class="form-control" name="editfname" id="editso">
-								                                  </div>
-								                                  <div class="form-group">
-								                                    <label>Customer Code</label>
-								                                    <input disabled type="text"  value="CC-<?php echo $cust; ?>" required class="form-control" name="aydi" id="editcust">
-								                                        
-								                                  </div>
-								                                  <div class="form-group">
-								                                    <label>Product</label>
-								                                        <select disabled class="form-control" name="userrole" id="editprod">
-								                                        <option value="" disabled selected=""><?php echo $product; ?></option>
-								                                          <?php 
-								                                            $selectacctype = "SELECT * FROM jamsfms_r_product ";
-
-								                                            $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
-								                                            while($row = mysqli_fetch_assoc($selectresult)){
-								                                                 $acctypename = $row['prod_name'];
-								                                                 $acctype_id = $row['prod_id'];   
-								                                            
-								                                          ?>
-								                                          <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
-								                                          <?php 
-								                                            }
-								                                          ?>
-								                                        </select>
-								                                  </div>
-								                                  <div class="form-group">
-								                                    <label>Quantity</label>
-								                                    <input disabled value="<?php echo $qty; ?>" type="text" required class="form-control form-control-sm" name="editlname" id="editqty">
-								                                  </div>
-								                                  <div class="form-group">
-								                                    <label>Date of Delivery</label>
-								                                    <input disabled value="<?php echo $ddate; ?>" type="text" required class="form-control form-control-sm" name="editlname" id="editddate">
-								                                  </div>
-								                           
-												</div>
-																		<div class="modal-footer">
-																			<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-																			<button type="submit" id="submit2" name="submit2" value="<?php echo $ID; ?>" class="btn btn-primary">Save changes</button>
-																		</div>
-																		
-																	</div>
-
-																</div>
-										</div>
-
-								        
-								<?php } ?>
-                                          	   
-                                </tbody>
-                                
-                            </table>
+                                   
+                        	<tr>
+                        		<th></th>
+                        		<th></th>
+                        		<th></th>
+                        	</tr>
+			                         
+			                        	<tr>
+			                        	<td><input required name="so_search" placeholder="Enter SO Number" class="form-control" type="text" style="width: 250px;" /></td><td>&nbsp&nbsp</td><td><button type="submit" class="btn btn-lime" id="viewpo" name="viewpo"  ><i class="fas fa-eye"></i> View PO status</button></td></tr>
+			                        
+                        <div class="panel-body">
+                        	</table>
+                        </form>
+                        <div id="Result"></div>
+                        	</div>
+                            
                         </div>
                         <!-- end panel-body -->
                     </div>
 			    </div>
+
 			    <!-- end col-10 -->
 			</div>
 			<!-- end row -->
 		</div>
-		<div id="results"></div>
+
 
 
 
@@ -307,67 +221,23 @@ include 'INCLUDES/userdetails.php';
 
 		
 		<!-- end #content -->
-		<div class="modal fade" id="modal-dialog">
-								<div class="modal-dialog">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h4 class="modal-title">Create New Sales Order</h4>
-											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-										</div>
-										<div class="modal-body">
-											<div class="widget-content padding">
-								<div class="form-group">
-                                    <label>Purchase Order Number</label>
-                                    <input type="number" required class="form-control" name="fname" id="in_po">
-                                  </div>
-                                	<div class="form-group">
-                                    <label>Customer Code</label>
-                                    <input type="number" required class="form-control form-control-sm" name="lname" id="in_cc">
-                                  </div>
-                                    <div class="form-group">
-                                    <label>Product</label>
-                                        <select class="form-control" name="userrole" id="in_prod">
-                                        <option value="" selected="">Select product</option>
-                                          <?php 
-                                            $selectacctype = "SELECT * FROM jamsfms_r_product ";
+		
 
-                                            $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
-                                            while($row = mysqli_fetch_assoc($selectresult)){
-                                                 $acctypename = $row['prod_name'];
-                                                 $acctype_id = $row['prod_id'];   
-                                            
-                                          ?>
-                                          <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
-                                          <?php 
-                                            }
-                                          ?>
-                                        </select>
-                                  </div>
-                                  <div class="form-group">
-                                    <label>Quantity</label>
-                                    <input type="number" required class="form-control" name="fname" id="in_qty">
-                                  </div>
-                                  <div class="form-group">
-                                    <label>Delivery Date</label>
-                                    <input type="date" required class="form-control form-control-sm" name="mname" id="in_dd">
-                                  </div>
-                                  
-                                  <!--<div class="form-group">
-                                    <label>Username</label>
-                                    <input type="text" class="form-control" name="username">
-                                  </div> -->
-                                  
-                                  <!--<button type="submit" class="btn btn-primary">Submit</button>
-                               -->
-                            </div>
-										</div>
-										<div class="modal-footer">
-											<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-											<button type="submit" id="submit" class="btn btn-primary">Save changes</button>
+                                   			<div class="modal fade" id="edit">
+																<div class="modal-dialog">
+																	<div class="modal-content">
+																		<div class="modal-header">
+																			<h4 class="modal-title">Sales Order</h4>
+																			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+																		</div>
+												
+
+																</div>
 										</div>
 									</div>
-								</div>
-							</div>
+
+								        
+								
         <!-- begin theme-panel -->
         <div class="theme-panel">
             <a href="javascript:;" data-click="theme-panel-expand" class="theme-collapse-btn"><i class="fa fa-cog"></i></a>
@@ -443,6 +313,63 @@ include 'INCLUDES/userdetails.php';
                 </div>
             </div>
         </div>
+        <div class="modal modal-message fade" id="modal-message">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title">Reset Password</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										</div>
+										<div class="modal-body">
+			                                 		<div class="panel panel-inverse" data-sortable-id="form-plugins-1">
+                    	<!-- begin panel-heading -->
+                        <div class="panel-heading">
+                            <div class="panel-heading-btn">
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-redo"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
+                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
+                            </div>
+                            <h4 class="panel-title">Configure fields to update password</h4>
+                        </div>
+                    	<!-- end panel-heading -->
+                    	<!-- begin panel-body -->
+                        <div class="panel-body panel-form">
+                            <form class="form-horizontal form-bordered">
+								<!--<div class="form-group row">
+									<label class="col-md-4 col-form-label">Current Password</label>
+									<div class="col-md-8">
+									    <input id="curr" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+							-->
+								<div class="form-group row">
+									<label class="col-md-4 col-form-label">New Password</label>
+									<div class="col-md-8">
+									    <input id="new" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+								<div class="form-group row">
+									<label class="col-md-4 col-form-label">Retype Password</label>
+									<div class="col-md-8">
+									    <input id="retype" required data-toggle="password" data-placement="after" class="form-control" type="password" placeholder="password" />
+									</div>
+								</div>
+								<div id="error"  style="display: none;"  class="alert alert-danger fade show">Passwords do not match!</div>
+								<div id="match"  style="display: none;"  class="alert alert-lime fade show">Passwords match!</div>
+								<div id="fillin"  style="display: none;"  class="alert alert-danger fade show">You did not made any entries!</div>
+							</form>
+                        </div>
+                        <!-- end panel-body -->
+                    </div>
+										</div>
+										<div class="modal-footer">
+											<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+											<button id="pass_btn" class="btn btn-primary">Change Password</button>
+										</div>
+									</div>
+								</div>
+							</div>
         <!-- end theme-panel -->
 		
 		<!-- begin scroll to top btn -->
@@ -487,45 +414,28 @@ include 'INCLUDES/userdetails.php';
 	<script src="../assets/plugins/gritter/js/jquery.gritter.js"></script>
 	<script src="../assets/js/demo/ui-modal-notification.demo.min.js"></script>
 
-	<script src="../assets/plugins/switchery/switchery.min.js"></script>
-	<script src="../assets/plugins/powerange/powerange.min.js"></script>
-	<script src="../assets/js/demo/form-slider-switcher.demo.min.js"></script>
+	
 
 	<!-- ================== END PAGE LEVEL JS ================== -->
-
-	<!--
-	<script type="text/javascript">
-		function getProduct(value){
-		$('#editprod').change(function(){
-			var value = $this.val();
-			$.post("searchprod.php",  {id:value}, function(data){
-				$("#results").append(data);
-				console.log(name);
-			 });
-		});
-	}
-	</script>
-	-->
 	<script type="text/javascript">
         $('#submit').click(function(e){
             e.preventDefault();
 
-            var e = document.getElementById('in_prod');
+            var e = document.getElementById('getsel');
             var get = e.options[e.selectedIndex].value;
-            var po = document.getElementById('in_po').value;
-            var cc = document.getElementById('in_cc').value;
-            var qty = document.getElementById('in_qty').value;
-            var dd = document.getElementById('in_dd').value;
+            var nameuser = document.getElementById('uname').value;
+            var mnameuser = document.getElementById('mname').value;
+            var lnameuser = document.getElementById('lname').value;
 
 
             if (get == "")
             {
-                if (document.getElementById('in_prod').options[e.selectedIndex].value == '')
+                if (document.getElementById('getsel').options[e.selectedIndex].value == '')
                 {
-                    document.getElementById('in_prod').options[0].innerText = "Please select";
-                    document.getElementById('in_prod').focus();
-                    document.getElementById('in_prod').style.borderColor = "#B94A48";
-                    document.getElementById('in_prod').style.color = "#B94A48";
+                    document.getElementById('getsel').options[0].innerText = "Please select";
+                    document.getElementById('getsel').focus();
+                    document.getElementById('getsel').style.borderColor = "#B94A48";
+                    document.getElementById('getsel').style.color = "#B94A48";
                 }
 
 
@@ -534,7 +444,7 @@ include 'INCLUDES/userdetails.php';
             else
             {
                 swal({
-                        title: "Submit sales order?",
+                        title: "Create user account?",
                         text: "Account details will be stored in the database.",
                         type: "warning",
                         showCancelButton: true,
@@ -552,24 +462,23 @@ include 'INCLUDES/userdetails.php';
                       
                         $.ajax({
                                     type: 'POST',
-                                    url: 'INCLUDES/createso.php',
+                                    url: 'INCLUDES/createacc.php',
                                     async: false,
                                     data: {
-                                        _po: po,
-                                        _cc: cc,
-                                        _qty: qty,
-                                        _dd: dd,
-                                        _prod: get
+                                        _name: nameuser,
+                                        _acctype: get,
+                                        _mname: mnameuser,
+                                        _lname: lnameuser
                                     },
                                     success: function(data) {
                                         
 
-                                        swal("Sales Order is created successfully! ", "Order is saved.", "success");
+                                        swal("Account is created successfully! ", "You may now access your account.", "success");
                                         
                                         setTimeout(function() 
                                         {
-                                           window.location = 'ac-sales.php';
-                                           // document.getElementById('add-regular').click();
+                                            window.location = 'admin-accountsetup.php';
+                                            document.getElementById('add-regular').click();
                                         },3000);
                                     },
                                     error: function(data) {
@@ -587,7 +496,7 @@ include 'INCLUDES/userdetails.php';
                     } 
                     else
                     {
-                        swal("Cancelled", "Sales order is not created.", "error");
+                        swal("Cancelled", "Account is not created.", "error");
                     }
                 });
                 
@@ -604,11 +513,9 @@ include 'INCLUDES/userdetails.php';
             e.preventDefault();
 
             var id =$(this).attr('value');
-            var e_so = $('div[id=edit'+id+']').find('input[id=editso]').val();
-            var e_prod = $('div[id=edit'+id+']').find('select[id=editprod]').val();
-            var e_qty = $('div[id=edit'+id+']').find('input[id=editqty]').val(); 
-            var e_ddate = $('div[id=edit'+id+']').find('input[id=editddate]').val(); 
-            var e_cust = $('div[id=edit'+id+']').find('input[id=editcust]').val(); 
+            var nameuser = $('div[id=edit'+id+']').find('input[id=edituname]').val();
+            var mnameuser = $('div[id=edit'+id+']').find('input[id=editmname]').val();
+            var lnameuser = $('div[id=edit'+id+']').find('input[id=editlname]').val(); 
 
             /*
             
@@ -621,8 +528,8 @@ include 'INCLUDES/userdetails.php';
             
            
                 swal({
-                        title: "Update sales order?",
-                        text: "Sales order updates will be stored in the database.",
+                        title: "Update user account?",
+                        text: "Account details will be stored in the database.",
                         type: "warning",
                         showCancelButton: true,
                         confirmButtonColor: '#b05544',
@@ -639,25 +546,23 @@ include 'INCLUDES/userdetails.php';
                       
                         $.ajax({
                                     type: 'POST',
-                                    url: 'INCLUDES/updateso.php',
+                                    url: 'INCLUDES/updateacc.php',
                                     async: false,
                                     data: {
-                                        _so: e_so,
-                                        _prod: e_prod,
-                                        _qty: e_qty,
-                                        _ddate: e_ddate,
-                                        _cust: e_cust,
+                                        _name: nameuser,
+                                        _mname: mnameuser,
+                                        _lname: lnameuser,
                                         _aydi: id
                                     },
                                     success: function(data) {
                                         
 
-                                        swal(" Sales order is updated! ", "Changes are made.", "success");
+                                        swal("Account details are updated! ", "Changes are made.", "success");
                                         
                                         setTimeout(function() 
                                         {
-                                            //window.location = 'ac-sales.php';
-                                            //document.getElementById('add-regular').click();
+                                            window.location = 'admin-accountsetup.php';
+                                            document.getElementById('add-regular').click();
                                         },3000);
                                     },
                                     error: function(data) {
@@ -758,59 +663,127 @@ include 'INCLUDES/userdetails.php';
 
         });
             </script>
-            <script type="text/javascript">
-        $('input[id=toggle]').change(function(e){
-            e.preventDefault(); 
-			//var id = $(this);
-			var id =$(this).attr('value');
 
-			if(this.checked){
-				$("input:disabled").removeAttr("disabled"); 
-				//$("[id=toggleicon").attr("class", "fa fa-shopping-cart"); 
-			console.log();
-			}
+<script>
+	$(document).ready(function() {
+			$("#formsub").submit(function(e) {
 
-			else if (!this.checked)
-			{
-				/*
-				var id = $(this).attr('value');
-				var a = $('div[id=edit'+id+']').find('input[id=edituname]').attr('id');
-				//$('#'+a).attr("disabled",true);
-				var b = $('#'+a).attr("disabled",true);
-				console.log(b);
-				alert(b);
-				*/
-				//var a = $('div[id=edit'+id+']').find('`select[id=editprod]').attr('id');
-				var b = $('div[id=edit'+id+']').find('input[id=editqty]').attr('id');
-				var c = $('div[id=edit'+id+']').find('input[id=editcust]').attr('id');
-				var d = $('div[id=edit'+id+']').find('input[id=editddate]').attr('id');
-				var e = $('div[id=edit'+id+']').find('input[id=editcompany]').attr('id');
-				var f = $('div[id=edit'+id+']').find('input[id=editso]').attr('id');
-				//	$("[id="+a+"]").prop("disabled", "disabled"); 
-					$("[id="+b+"]").prop("disabled", "disabled"); 
-					$("[id="+c+"]").prop("disabled", "disabled"); 
-					$("[id="+d+"]").prop("disabled", "disabled"); 
-					$("[id="+e+"]").prop("disabled", "disabled"); 
-					$("[id="+f+"]").prop("disabled", "disabled"); 
-					
+        $.ajax({
+               type: "POST",
+               url: cu-inquiry.php,
+               data: $("#formsub").serialize(), 
+               success: function(data)
+               {
+                   $('#Result').html(data); 
+               }
+             });
 
-					
-			}
-			
-
-        });
-    </script>
-
-
+        e.preventDefault(); // avoid to execute the actual submit of the form.
+    }); 
+		});
+</script>
 	<script>
 		$(document).ready(function() {
 			App.init();
 			Notification.init();
 			TableManageCombine.init();
-			FormSliderSwitcher.init();
 		});
 	</script>
 
+
+
+<script type="text/javascript">
+		
+		$( 'input[id=retype]').keyup(function(){
+			
+			var pass1 = document.getElementById('new').value;
+			var pass2 = document.getElementById('retype').value;
+			if( pass1 != pass2)
+				{$("#error").show(); 
+				$("#match").hide();
+				$("#fillin").hide();
+			}
+			if ( pass1 == pass2){$("#match").show(); $("#error").hide(); $("#fillin").hide();}
+			
+		});
+	</script>
+	<script type="text/javascript">
+        $('#pass_btn').click(function(e){
+            e.preventDefault();
+
+            
+           // var currpass = document.getElementById('curr').value;
+            var newpass = document.getElementById('new').value;
+            var useraydi = document.getElementById('u_id').value;
+           	
+           	if(newpass == "" || useraydi == ""){
+           		$("#fillin").show();
+           	}
+           	else{
+           		$("#fillin").hide();
+			   swal({
+                        title: "Update password?",
+                        text: "New password will be saved.",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#b05544',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: "No",
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+
+                },
+                function(isConfirm){
+                    if (isConfirm) {
+                    	 
+
+                      
+                        $.ajax({
+                                    type: 'POST',
+                                    url: 'INCLUDES/updatepass.php',
+                                    async: false,
+                                    data: {
+                                        
+                                        _id: useraydi,
+                                        _pass: newpass
+
+                                    },
+                                    success: function(data) {
+                                        
+
+                                        swal("Password is changed! ", "Entries are saved.", "success");
+                                        
+                                        setTimeout(function() 
+                                        {
+                                            window.location = 'admin-dashboard.php';
+                                            //document.getElementById('add-regular').click();
+                                        },3000);
+                                    },
+                                    error: function(data) {
+                                       
+                                        swal("Error", "Something is wrong.", "error");
+                                    }
+
+                                }); 
+
+                        
+                            	
+   		 			
+                    
+
+                    } 
+                    else
+                    {
+                        swal("Cancelled", "", "error");
+                    }
+                });
+                
+             
+           }
+            
+
+        });
+    </script>
 
 </body>
 </html>

@@ -12,16 +12,61 @@ if( isset($_POST["loginb"]))
 
 $username = $_POST['username'];
 $password = $_POST['password'];
-
+$transtype = $_POST['transtype'];
 
     $check = "SELECT * FROM jamfms_r_useraccount WHERE username='$username' and pass='$password'";
+   
     $check_q = mysqli_query($connect, $check) or die("<div class='loginmsg'>Error on checking Username<div>");
+    while ($row = mysqli_fetch_assoc($check_q)) {
+        $role = $row['acctype_fk'];
+        $uid = $row['useraccountID'];
+    }
+        //echo $uid;
+        //echo $transtype;
+
 
     if (mysqli_num_rows($check_q) == 1) {
        // chcklogin($username, $password);
-    	echo "correct username";
+
+    	//echo "correct username";
+        if ($role == 1)
+        {
     	$_SESSION['username'] = $username;
+       /* $insert = "INSERT INTO `audit_trail`( `userid`, `transtype`, `transdatetime`) VALUES ($uid, '$transtype', CURRENT_TIMESTAMP)";
+        
+        $audittrail = mysqli_query($connect, $insert) or die("Bad query");*/
+            
         header('Location: admin-dashboard.php');
+        }
+        //header('Location: admin-dashboard.php');
+        elseif ($role == 2) {
+        $_SESSION['username'] = $username;
+
+        header('Location: mo-dashboard.php');
+        }
+        elseif ($role == 3) {
+        $_SESSION['username'] = $username;
+        header('Location: fo-dashboard.php');
+        }
+        elseif ($role == 4) {
+        $_SESSION['username'] = $username;
+        header('Location: ac-dashboard.php');
+        }
+        elseif ($role == 5) {
+        $_SESSION['username'] = $username;
+        header('Location: cu-home.php');
+        }
+        elseif ($role == 6) {
+        $_SESSION['username'] = $username;
+        header('Location: inv-home.php');
+        }
+        elseif ($role == 7) {
+        $_SESSION['username'] = $username;
+        header('Location: stk-home.php');
+        }
+        $insert = "INSERT INTO `audit_trail`( `userid`, `transtype`, `transdatetime`) VALUES ($uid, '$transtype', CURRENT_TIMESTAMP)";
+        
+        $audittrail = mysqli_query($connect, $insert) or die("Bad query");
     }
     else{  ?>
    	<script>
@@ -84,7 +129,8 @@ $password = $_POST['password'];
                         <input type="password" id="password" name="password" class="form-control form-control-lg inverse-mode" placeholder="Password" required />
                     </div>
                     <div class="checkbox checkbox-css m-b-20">
-                        <input type="checkbox" id="remember_checkbox" /> 
+                        <input type="checkbox" id="remember_checkbox" />
+                        <input type="hidden" name="transtype" value="Log in" /> 
                         <label for="remember_checkbox">
                         	Remember Me
                         </label>
@@ -186,13 +232,7 @@ $password = $_POST['password'];
 		});
 	</script>
 
-	<script>
-   		$(document).ready(function(){
-   		 $("#loginerror").show(function(){
-      
-		    });
-			});
-	</script>
+
 
 	<?php include 'INCLUDES/js.php';?>
 </body>

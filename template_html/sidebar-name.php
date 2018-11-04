@@ -9,7 +9,7 @@
 							<div class="info">
 								<b class="caret pull-right"></b>
 							<?php echo $name; ?>
-								<small>Administrator</small>
+								<small><?php echo $userrole; ?></small>
 							</div>
 						</a>
 					</li>
