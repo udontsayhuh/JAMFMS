@@ -118,8 +118,8 @@ include 'INCLUDES/userdetails.php';
 				<!-- begin sidebar nav -->
 				<ul class="nav">
 					<li class="nav-header">Navigation</li>
-					<li><a href="inv-home.php"><i class="fas fa-question-home"></i> <span>Home</span></a></li>
-					<li class="active"><a href="inv-inquiry.php"><i class="fas fa-users"></i> <span>PO Inquiry</span></a></li>
+					<li><a href="inv-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
+					<li class="active"><a href="inv-inquiry.php"><i class="fas fa-money-bill-alt"></i> <span>Investment Inquiry</span></a></li>
 			        <!-- end sidebar minify button -->
 				</ul>
 				<!-- end sidebar nav -->
@@ -142,71 +142,283 @@ include 'INCLUDES/userdetails.php';
 			<!-- begin page-header -->
 			<h1 class="page-header">Investment Inquiry Page</h1>
 			<!-- end page-header -->
-			
+			<?php 
+
+				$selectinv = "SELECT C.companyname as cname, B.po_num, A.stkh_percent, D.prod_machinecost + D.prod_materialcost AS PRODUCTION_COST, B.prod_poamount as AMOUNT, B.prod_poamount - (D.prod_machinecost + D.prod_materialcost) AS NET_INCOME,  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2) as INVESTMENT  FROM jamsfms_r_stakeholder AS A
+					INNER JOIN jamsfms_r_sales AS B
+					ON A.fk_so_id = B.so_id
+					INNER JOIN jamsfms_r_customer AS C
+					ON B.customer_code = C.customerid
+					INNER JOIN jamsfms_r_product AS D
+					ON B.fk_prod_id = D.prod_id
+					inner JOIN jamfms_r_useraccount as E 
+					ON A.fk_user_id = E.useraccountID where e.username = '".$username."'";
+				$invresult = mysqli_query($connect, $selectinv) or die('Bad query: $sql'); 
+				$numrows = mysqli_num_rows($invresult);
+
+				if ($numrows > 0){
+				while ($row = mysqli_fetch_assoc($invresult) ) {
+					    $companyname = $row['cname'];
+					    $investment = $row['INVESTMENT'];
+					    $percent = $row['stkh_percent'];
+					    $AMOUNT = $row['NET_INCOME'];
+					
+			 ?>
 			<!-- begin row -->
-			<div class="row">
-			    <!-- begin col-2 -->
-			    <div class="col-lg-2">
-			        <h5>The Inquiry Page does the following features:</h5>
-                    <ul class="p-l-25 m-b-15">
-                        <li>View Investment Status</li>
-                        <li>Print Investment Report</li>
-                        
-                    
-                    </ul>
-			    </div>
-			    <!-- end col-2 -->
-			    <!-- begin col-10 -->
-			    <div class="col-lg-10">
-                    <div class="panel panel-inverse">
-                        <!-- begin panel-heading -->
-                        <div class="panel-heading">
-                            <div class="panel-heading-btn">
-                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-default" data-click="panel-expand"><i class="fa fa-expand"></i></a>
-                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-success" data-click="panel-reload"><i class="fa fa-redo"></i></a>
-                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-warning" data-click="panel-collapse"><i class="fa fa-minus"></i></a>
-                                <a href="javascript:;" class="btn btn-xs btn-icon btn-circle btn-danger" data-click="panel-remove"><i class="fa fa-times"></i></a>
-                            </div>
-                            <h4 class="panel-title">Purchase Orders</h4>
-                        </div>
-                        <!-- end panel-heading -->
-                        <!-- begin panel-body -->
-                        <div style="padding: 40px;">
-                        	<form id="formsub" action="cu-inquiry.php" method="POST">
-                        <table>
-                        	 <?php 
-                                                $tablesql = "SELECT * FROM `jamsfms_r_sales` order by so_id desc";
-                                                $tableresult = mysqli_query($connect, $tablesql) or die("Bad query: $sql");
-
-                                                while ($row = mysqli_fetch_assoc($tableresult)) {
-                                                	$ID = $row['so_id'];
-                                                    $cust = $row['customer_code'];
-                                                    $so = $row['po_num'];
-                                                    $qty = $row['so_qty'];
-                                                    $ddate = $row['deldate'];
-
-                                                }
-                                               ?>
-                                   
-                        	<tr>
-                        		<th></th>
-                        		<th></th>
-                        		<th></th>
-                        	</tr>
-			                         
-			                        	<tr>
-			                        	<td><input required name="so_search" placeholder="Enter SO Number" class="form-control" type="text" style="width: 250px;" /></td><td>&nbsp&nbsp</td><td><button type="submit" class="btn btn-lime" id="viewpo" name="viewpo"  ><i class="fas fa-eye"></i> View PO status</button></td></tr>
-			                        
-                        <div class="panel-body">
-                        	</table>
-                        </form>
-                        <div id="Result"></div>
-                        	</div>
-                            
-                        </div>
-                        <!-- end panel-body -->
+			<div class="invoice" style="width: 1000px;">
+                <!-- begin invoice-company -->
+                <div class="invoice-company text-inverse f-w-600">
+                    <span class="pull-right hidden-print">
+                    <a href="javascript:;" class="btn btn-sm btn-white m-b-10 p-l-5"><i class="fa fa-file-pdf t-plus-1 text-danger fa-fw fa-lg"></i> Export as PDF</a>
+                    <a href="javascript:;" onclick="window.print()" class="btn btn-sm btn-white m-b-10 p-l-5"><i class="fa fa-print t-plus-1 fa-fw fa-lg"></i> Print</a>
+                    </span>
+                    <?php echo $companyname; ?> Project
+                </div>
+                <!-- end invoice-company -->
+                <!-- begin invoice-header -->
+                <!--<div class="invoice-header">
+                    <div class="invoice-from">
+                        <small>from</small>
+                        <address class="m-t-5 m-b-5">
+                            <strong class="text-inverse">Twitter, Inc.</strong><br />
+                            Street Address<br />
+                            City, Zip Code<br />
+                            Phone: (123) 456-7890<br />
+                            Fax: (123) 456-7890
+                        </address>
                     </div>
-			    </div>
+                    <div class="invoice-to">
+                        <small>to</small>
+                        <address class="m-t-5 m-b-5">
+                            <strong class="text-inverse">Company Name</strong><br />
+                            Street Address<br />
+                            City, Zip Code<br />
+                            Phone: (123) 456-7890<br />
+                            Fax: (123) 456-7890
+                        </address>
+                    </div>
+                    <div class="invoice-date">
+                        <small>Invoice / July period</small>
+                        <div class="date text-inverse m-t-5">August 3,2012</div>
+                        <div class="invoice-detail">
+                            #0000123DSS<br />
+                            Services Product
+                        </div>
+                    </div>
+                </div> -->
+                <!-- end invoice-header -->
+                <!-- begin invoice-content -->
+                <!-- begin table-responsive -->
+                <!--
+                <div class="invoice-content">
+                	
+                    <div class="table-responsive">
+                        <table class="table table-invoice">
+                            <thead>
+                                <tr>
+                                    <th>TASK DESCRIPTION</th>
+                                    <th class="text-center" width="10%">RATE</th>
+                                    <th class="text-center" width="10%">HOURS</th>
+                                    <th class="text-right" width="20%">LINE TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Website design &amp; development</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">50</td>
+                                    <td class="text-right">$2,500.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Branding</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">40</td>
+                                    <td class="text-right">$2,000.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Redesign Service</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">50</td>
+                                    <td class="text-right">$2,500.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> -->
+                	<!-- end table-responsive -->
+                	<!-- begin invoice-price -->
+                    <div class="invoice-price">
+                        <div class="invoice-price-left">
+                            <div class="invoice-price-row">
+                                <div class="sub-price">
+                                    <small>NET INCOME</small>
+                                    <span class="text-inverse">PHP <?php echo $AMOUNT; ?></span>
+                                </div>
+                                <div class="sub-price">
+                                    <i class="fa fa-times text-muted"></i>
+                                </div>
+                                <div class="sub-price">
+                                    <small>INVESTMENT RATE %</small>
+                                    <span class="text-inverse"><?php echo $percent; ?>%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invoice-price-right">
+                            <small>TOTAL</small> <span class="f-w-600">PHP <?php echo $investment; ?></span>
+                        </div>
+
+                    </div>
+                	<!-- end invoice-price -->
+                </div>
+                <?php }}
+                	else{ ?>
+                		<div class="invoice" style="width: 1000px;">
+                <!-- begin invoice-company -->
+                <div class="invoice-company text-inverse f-w-600">
+                    <span class="pull-right hidden-print">
+                    <a href="javascript:;" class="btn btn-sm btn-white m-b-10 p-l-5"><i class="fa fa-file-pdf t-plus-1 text-danger fa-fw fa-lg"></i> Export as PDF</a>
+                    <a href="javascript:;" onclick="window.print()" class="btn btn-sm btn-white m-b-10 p-l-5"><i class="fa fa-print t-plus-1 fa-fw fa-lg"></i> Print</a>
+                    </span>
+                    -- 
+                </div>
+                <!-- end invoice-company -->
+                <!-- begin invoice-header -->
+                <!--<div class="invoice-header">
+                    <div class="invoice-from">
+                        <small>from</small>
+                        <address class="m-t-5 m-b-5">
+                            <strong class="text-inverse">Twitter, Inc.</strong><br />
+                            Street Address<br />
+                            City, Zip Code<br />
+                            Phone: (123) 456-7890<br />
+                            Fax: (123) 456-7890
+                        </address>
+                    </div>
+                    <div class="invoice-to">
+                        <small>to</small>
+                        <address class="m-t-5 m-b-5">
+                            <strong class="text-inverse">Company Name</strong><br />
+                            Street Address<br />
+                            City, Zip Code<br />
+                            Phone: (123) 456-7890<br />
+                            Fax: (123) 456-7890
+                        </address>
+                    </div>
+                    <div class="invoice-date">
+                        <small>Invoice / July period</small>
+                        <div class="date text-inverse m-t-5">August 3,2012</div>
+                        <div class="invoice-detail">
+                            #0000123DSS<br />
+                            Services Product
+                        </div>
+                    </div>
+                </div> -->
+                <!-- end invoice-header -->
+                <!-- begin invoice-content -->
+                <!-- begin table-responsive -->
+                <!--
+                <div class="invoice-content">
+                	
+                    <div class="table-responsive">
+                        <table class="table table-invoice">
+                            <thead>
+                                <tr>
+                                    <th>TASK DESCRIPTION</th>
+                                    <th class="text-center" width="10%">RATE</th>
+                                    <th class="text-center" width="10%">HOURS</th>
+                                    <th class="text-right" width="20%">LINE TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Website design &amp; development</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">50</td>
+                                    <td class="text-right">$2,500.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Branding</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">40</td>
+                                    <td class="text-right">$2,000.00</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="text-inverse">Redesign Service</span><br />
+                                        <small>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed id sagittis arcu.</small>
+                                    </td>
+                                    <td class="text-center">$50.00</td>
+                                    <td class="text-center">50</td>
+                                    <td class="text-right">$2,500.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> -->
+                	<!-- end table-responsive -->
+                	<!-- begin invoice-price -->
+                    <div class="invoice-price">
+                        <div class="invoice-price-left">
+                            <div class="invoice-price-row">
+                                <div class="sub-price">
+                                    <small>NET INCOME</small>
+                                    <span class="text-inverse">PHP --</span>
+                                </div>
+                                <div class="sub-price">
+                                    <i class="fa fa-times text-muted"></i>
+                                </div>
+                                <div class="sub-price">
+                                    <small>INVESTMENT RATE %</small>
+                                    <span class="text-inverse">PHP --</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invoice-price-right">
+                            <small>TOTAL</small> <span class="f-w-600">PHP --</span>
+                        </div>
+
+                    </div>
+                	<!-- end invoice-price -->
+                </div>
+                <?php
+                	}
+                ?>
+
+
+                <!-- end invoice-content -->
+                <!-- begin invoice-note -->
+                <div class="invoice-note">
+                    * Make all cheques payable to [Your Company Name]<br />
+                    * Payment is due within 30 days<br />
+                    * If you have any questions concerning this invoice, contact  [Name, Phone Number, Email]
+                </div>
+                <!-- end invoice-note -->
+                <!-- begin invoice-footer -->
+                <div class="invoice-footer">
+                    <p class="text-center m-b-5 f-w-600">
+                        THANK YOU FOR YOUR BUSINESS
+                    </p>
+                    <p class="text-center">
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-globe"></i> matiasgallipoli.com</span>
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-phone-volume"></i> T:016-18192302</span>
+                        <span class="m-r-10"><i class="fa fa-fw fa-lg fa-envelope"></i> rtiemps@gmail.com</span>
+                    </p>
+                </div>
+                <!-- end invoice-footer -->
+            </div>
 
 			    <!-- end col-10 -->
 			</div>

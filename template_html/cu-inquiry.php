@@ -19,13 +19,13 @@ while ($row = mysqli_fetch_assoc($nameresult) ) {
 }*/
 
 ////$username = $_POST['username'];
-$so_search = $_POST['so_search'];
-$selectso = "SELECT * FROM `jamsfms_r_sales` as a inner join jamsfms_r_product as b on a.fk_prod_id = b.prod_id where a.so_id = $so_search";
+$so_search =trim($_POST['so_search']);
+$selectso = "SELECT * FROM `jamsfms_r_sales` as a inner join jamsfms_r_product as b on a.fk_prod_id = b.prod_id where a.po_num = $so_search";
 $so_result = mysqli_query($connect, $selectso) or die('Bad query: $sql'); 
 
 while ($row1 = mysqli_fetch_assoc($so_result)) {
                                                 	$ID = $row1['so_id'];
-                                                    $cust = $row1['customer_code'];
+                                                    $cust = $row1['customer_codee'];
                                                     $so = $row1['po_num'];
                                                     $qty = $row1['so_qty'];
                                                     $ddate = $row1['deldate'];

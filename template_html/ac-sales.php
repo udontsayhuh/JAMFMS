@@ -120,6 +120,7 @@ include 'INCLUDES/userdetails.php';
 					<li class="nav-header">Navigation</li>
 					<li><a href="ac-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
 					<li class="active"><a href="ac-sales.php"><i class="fas fa-users"></i> <span>Sales Management</span></a></li>
+					
 			        <!-- end sidebar minify button -->
 				</ul>
 				<!-- end sidebar nav -->
@@ -197,7 +198,7 @@ include 'INCLUDES/userdetails.php';
                                  </tfoot>
                                 <tbody>
                                    <?php 
-                                                $tablesql = "SELECT * FROM `jamsfms_r_sales` as a inner join jamsfms_r_product as B on A.fk_prod_id = B.prod_id order by A.so_id desc";
+                                                $tablesql = "SELECT *  FROM `jamsfms_r_sales` as a inner join jamsfms_r_product as B on A.fk_prod_id = B.prod_id order by A.so_id desc";
                                                 $tableresult = mysqli_query($connect, $tablesql) or die("Bad query: $sql");
 
                                                 while ($row = mysqli_fetch_assoc($tableresult)) {
@@ -207,6 +208,7 @@ include 'INCLUDES/userdetails.php';
                                                     $qty = $row['so_qty'];
                                                     $ddate = $row['deldate'];
                                                     $product = $row['prod_name'];
+                                                    $prod_poamount = $row['prod_poamount'];
 
                                                 
                                                ?>
@@ -238,11 +240,16 @@ include 'INCLUDES/userdetails.php';
 								                                  <div class="form-group">
 								                                  	<input type="text" style="display: none;" value="<?php echo $ID; ?>" required class="form-control" name="aydi" id="aydi">
 								                                    <label>Sales Order</label>
-								                                   <input disabled type="text" value="SO-<?php echo $so; ?>" required class="form-control" name="editfname" id="editso">
+								                                   <input disabled type="text" value="<?php echo $so; ?>" required class="form-control" name="editfname" id="editso">
+								                                  </div>
+								                                  <div class="form-group">
+								                                  	<input type="text" style="display: none;" value="<?php echo $ID; ?>" required class="form-control" name="aydi" id="aydi">
+								                                    <label>Sales Order Amount</label>
+								                                   <input disabled type="text" value="<?php echo $prod_poamount; ?>" required class="form-control" name="editfname" id="editamt">
 								                                  </div>
 								                                  <div class="form-group">
 								                                    <label>Customer Code</label>
-								                                    <input disabled type="text"  value="CC-<?php echo $cust; ?>" required class="form-control" name="aydi" id="editcust">
+								                                    <input disabled type="text"  value="<?php echo $cust; ?>" required class="form-control" name="aydi" id="editcust">
 								                                        
 								                                  </div>
 								                                  <div class="form-group">
@@ -323,6 +330,10 @@ include 'INCLUDES/userdetails.php';
                                 	<div class="form-group">
                                     <label>Customer Code</label>
                                     <input type="number" required class="form-control form-control-sm" name="lname" id="in_cc">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Sales Order Amount</label>
+                                    <input type="number" required class="form-control form-control-sm" name="lname" id="in_amt">
                                   </div>
                                     <div class="form-group">
                                     <label>Product</label>
@@ -516,6 +527,7 @@ include 'INCLUDES/userdetails.php';
             var cc = document.getElementById('in_cc').value;
             var qty = document.getElementById('in_qty').value;
             var dd = document.getElementById('in_dd').value;
+            var amt = document.getElementById('in_amt').value;
 
 
             if (get == "")
@@ -535,7 +547,7 @@ include 'INCLUDES/userdetails.php';
             {
                 swal({
                         title: "Submit sales order?",
-                        text: "Account details will be stored in the database.",
+                        text: "Sales order details will be stored in the database.",
                         type: "warning",
                         showCancelButton: true,
                         confirmButtonColor: '#b05544',
@@ -559,7 +571,8 @@ include 'INCLUDES/userdetails.php';
                                         _cc: cc,
                                         _qty: qty,
                                         _dd: dd,
-                                        _prod: get
+                                        _prod: get,
+                                        _amt: amt
                                     },
                                     success: function(data) {
                                         
@@ -605,10 +618,11 @@ include 'INCLUDES/userdetails.php';
 
             var id =$(this).attr('value');
             var e_so = $('div[id=edit'+id+']').find('input[id=editso]').val();
-            var e_prod = $('div[id=edit'+id+']').find('select[id=editprod]').val();
+           // var e_prod = $('div[id=edit'+id+']').find('select[id=editprod]').val();
             var e_qty = $('div[id=edit'+id+']').find('input[id=editqty]').val(); 
             var e_ddate = $('div[id=edit'+id+']').find('input[id=editddate]').val(); 
             var e_cust = $('div[id=edit'+id+']').find('input[id=editcust]').val(); 
+            var e_amt = $('div[id=edit'+id+']').find('input[id=editamt]').val(); 
 
             /*
             
@@ -643,11 +657,12 @@ include 'INCLUDES/userdetails.php';
                                     async: false,
                                     data: {
                                         _so: e_so,
-                                        _prod: e_prod,
+                                      //  _prod: e_prod,
                                         _qty: e_qty,
                                         _ddate: e_ddate,
                                         _cust: e_cust,
-                                        _aydi: id
+                                        _aydi: id,
+                                        _amt: e_amt
                                     },
                                     success: function(data) {
                                         
@@ -656,7 +671,7 @@ include 'INCLUDES/userdetails.php';
                                         
                                         setTimeout(function() 
                                         {
-                                            //window.location = 'ac-sales.php';
+                                            window.location = 'ac-sales.php';
                                             //document.getElementById('add-regular').click();
                                         },3000);
                                     },

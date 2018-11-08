@@ -106,6 +106,7 @@ include 'INCLUDES/userdetails.php';
 					<li class="nav-header">Navigation</li>
 					<li class="active"><a href="admin-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
 					<li><a href="fo-stakeholder.php"><i class="fas fa-users"></i> <span>Stakeholder Management</span></a></li>
+					<li><a href="fo-fund.php"><i class="fas fa-money-bill-alt"></i> <span>Fund Status Report</span></a></li>
 					
 					
 					
@@ -202,6 +203,7 @@ include 'INCLUDES/userdetails.php';
 				</div>
 				<!-- end col-3 -->
 			</div>
+			<div id="container"></div>
 
 					
 				</div>
@@ -374,6 +376,160 @@ include 'INCLUDES/userdetails.php';
 	<script src="../assets/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 	<script src="../assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="../assets/js/demo/dashboard.min.js"></script>
+	<script src="../assets/hcharts/highcharts.js"></script>
+	<script src="../assets/hcharts/modules/series-label.js"></script>
+	<script src="../assets/hcharts/modules/exporting.js"></script>
+	<script src="../assets/hcharts/modules/export-data.js"></script>
+	<script src="../assets/hcharts/modules/data.js"></script>
+	<script src="../assets/hcharts/modules/drilldown.js"></script>
+	
+
+<script type="text/javascript">
+
+// Create the chart
+Highcharts.chart('container', {
+    chart: {
+        type: 'bar'
+    },
+    title: {
+        text: 'Fund'
+    },
+    subtitle: {
+        text: 'By Project'
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            text: 'Total'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f}'
+            }
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+    },
+
+    "series": [
+        {
+            "name": "Fund",
+            "colorByPoint": true,
+            "data": [
+               <?php 
+               $tablesql = "SELECT  sum(((B.prod_poamount - (D.prod_machinecost + D.prod_materialcost)) -  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2)) * .2) AS SUMOF
+
+                                                	FROM jamsfms_r_stakeholder AS A 
+													INNER JOIN jamsfms_r_sales AS B
+													ON A.fk_so_id = B.so_id
+													INNER JOIN jamsfms_r_customer AS C
+													ON B.customer_code = C.customerid
+													INNER JOIN jamsfms_r_product AS D
+													ON B.fk_prod_id = D.prod_id
+													inner JOIN jamfms_r_useraccount as E 
+													ON A.fk_user_id = E.useraccountID";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+ 					$year = $row['SUMOF'];
+                ?> 
+ 				{
+                    "name": "<?php echo $year;?>",
+                    "y": 
+                    	 <?php 
+			               $tablesql1 = "SELECT  sum(((B.prod_poamount - (D.prod_machinecost + D.prod_materialcost)) -  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2)) * .2) AS qtt
+
+                                                	FROM jamsfms_r_stakeholder AS A 
+													INNER JOIN jamsfms_r_sales AS B
+													ON A.fk_so_id = B.so_id
+													INNER JOIN jamsfms_r_customer AS C
+													ON B.customer_code = C.customerid
+													INNER JOIN jamsfms_r_product AS D
+													ON B.fk_prod_id = D.prod_id
+													inner JOIN jamfms_r_useraccount as E 
+													ON A.fk_user_id = E.useraccountID";
+			                $tableresult1 = mysqli_query($connect, $tablesql1) or die(mysqli_error($connect)); 
+			 				while ($row1 = mysqli_fetch_assoc($tableresult1)) {
+			               ?> 
+			               
+			               	<?php echo $row1['qtt'] ?>,
+
+			               <?php }?> 
+                    "drilldown": "<?php echo $year;?>"
+                },
+                <?php } ?>
+               
+            ]
+        }
+    ],
+    "drilldown": {
+        "series": [
+
+            <?php 
+               $tablesql = "SELECT  sum(((B.prod_poamount - (D.prod_machinecost + D.prod_materialcost)) -  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2)) * .2) AS SUMOF
+
+                                                	FROM jamsfms_r_stakeholder AS A 
+													INNER JOIN jamsfms_r_sales AS B
+													ON A.fk_so_id = B.so_id
+													INNER JOIN jamsfms_r_customer AS C
+													ON B.customer_code = C.customerid
+													INNER JOIN jamsfms_r_product AS D
+													ON B.fk_prod_id = D.prod_id
+													inner JOIN jamfms_r_useraccount as E 
+													ON A.fk_user_id = E.useraccountID";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+ 					$year = $row['SUMOF'];
+ 					//$month = $row['month'];
+            ?>
+             {
+                "name": "<?php echo $year;?>",
+            	"colorByPoint": true,
+                "id": "<?php echo $year;?>",
+                "data": [
+					<?php 
+				               $tablesql2 = "SELECT C.companyname as cname, B.po_num, A.stkh_percent, D.prod_machinecost + D.prod_materialcost AS PRODUCTION_COST, B.prod_poamount as AMOUNT, B.prod_poamount - (D.prod_machinecost + D.prod_materialcost) AS NET_INCOME,  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2) as INVESTMENT, (B.prod_poamount - (D.prod_machinecost + D.prod_materialcost)) -  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2) AS LESS, ((B.prod_poamount - (D.prod_machinecost + D.prod_materialcost)) -  ROUND(( B.prod_poamount - (D.prod_machinecost + D.prod_materialcost))*(A.stkh_percent/100),2)) * .2 AS FUND, concat(c.fname, ' ', c.lname) as fullname, b.po_num
+
+                                                	FROM jamsfms_r_stakeholder AS A 
+													INNER JOIN jamsfms_r_sales AS B
+													ON A.fk_so_id = B.so_id
+													INNER JOIN jamsfms_r_customer AS C
+													ON B.customer_code = C.customerid
+													INNER JOIN jamsfms_r_product AS D
+													ON B.fk_prod_id = D.prod_id
+													inner JOIN jamfms_r_useraccount as E 
+													ON A.fk_user_id = E.useraccountID";
+				                $tableresult2 = mysqli_query($connect, $tablesql2) or die(mysqli_error($connect)); 
+				 				while ($row = mysqli_fetch_assoc($tableresult2)) {
+				     ?>
+		                        [
+		                        "<?php echo $row['po_num'].'-'.$row['FUND']?>",
+		                        <?php echo $row['FUND']?>
+		                        ],
+                        <?php } ?>
+                ]
+            },
+
+            <?php }?> 
+        ]
+    }
+    
+});
+		</script>
 	<script>
 		$(document).ready(function() {
 			App.init();

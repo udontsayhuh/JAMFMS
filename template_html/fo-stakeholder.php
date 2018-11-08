@@ -122,6 +122,7 @@ include 'INCLUDES/userdetails.php';
 					<li class="nav-header">Navigation</li>
 					<li><a href="fo-dashboard.php"><i class="fas fa-chart-bar"></i> <span>Dashboard</span></a></li>
 					<li class="active"><a href="fo-stakeholder.php"><i class="fas fa-users"></i> <span>Stakeholder Management</span></a></li>
+					<li><a href="fo-fund.php"><i class="fas fa-money-bill-alt"></i> <span>Fund Status Report</span></a></li>
 			        <!-- end sidebar minify button -->
 				</ul>
 				<!-- end sidebar nav -->
@@ -176,7 +177,8 @@ include 'INCLUDES/userdetails.php';
                         </div>
                         <!-- end panel-heading -->
                         <!-- begin panel-body -->
-                        <div style="padding: 20px;"><button type="button" class="btn btn-lime" data-toggle="modal" data-target="#modal-dialog"><i class="fas fa-plus"></i> Add New Stakeholder</button></div>
+                        <div style="padding: 20px;"><button type="button" class="btn btn-lime" data-toggle="modal" data-target="#modal-dialog"><i class="fas fa-plus"></i> Add New Investor</button>
+                       <button type="button" class="btn btn-lime" data-toggle="modal" data-target="#modal-dialog2"><i class="fas fa-plus"></i> Add New Shareholder</button></div>
                         <div class="panel-body">
 
                             <table id="data-table-combine" class="table table-striped table-bordered">
@@ -201,7 +203,7 @@ include 'INCLUDES/userdetails.php';
                                  </tfoot>
                                 <tbody>
                                    <?php 
-                                                $tablesql = "SELECT *, IF (A.stkh_status = 0,'Active', 'inactive') AS status FROM `jamsfms_r_stakeholder` as A inner join `jamsfms_r_stakeholder_type` as B ON A.stkhid = B.st_type_id ORDER BY A.stkhid DESC";
+                                                $tablesql = "SELECT *, IF (A.stkh_status = 0,'Active', 'inactive') AS status FROM `jamsfms_r_stakeholder` as A inner join `jamsfms_r_stakeholder_type` as B ON A.fk_st_type_id = B.st_type_id ORDER BY A.stkhid DESC";
                                                 $tableresult = mysqli_query($connect, $tablesql) or die("Bad query: $sql");
 
                                                 while ($row = mysqli_fetch_assoc($tableresult)) {
@@ -313,23 +315,36 @@ include 'INCLUDES/userdetails.php';
 								<div class="modal-dialog">
 									<div class="modal-content">
 										<div class="modal-header">
-											<h4 class="modal-title">Add New Stakeholder</h4>
+											<h4 class="modal-title">Add New Investor</h4>
 											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 										</div>
 										<div class="modal-body">
 											<div class="widget-content padding">
                                 
                                     <div class="form-group">
-                                    <label>Category</label>
-                                        <select class="form-control" name="userrole" id="getsel">
-                                        <option value="" disabled selected="">Select stakeholder category</option>
+                                    <input type="hidden" name="" id="inv_id" value="00000001">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Investor Name</label>
+                                    <input type="text" required class="form-control" name="fname" id="inv_name">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Link User Account</label>
+                                        <select class="form-control" name="userrole" id="getselacc">
+                                        <option value="" disabled selected="">Link User Account</option>
                                           <?php 
-                                            $selectacctype = "SELECT * FROM `jamsfms_r_stakeholder_type";
+                                            $selectacctype = "SELECT a.fname, a.mname, a.lname, a.useraccountID from jamfms_r_useraccount as a 
+																inner join jamfms_r_accounttype as b
+																on b.acctypeid = a.acctype_fk
+																where b.acctype_name = 'Investor'";
 
                                             $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
                                             while($row = mysqli_fetch_assoc($selectresult)){
-                                                 $acctypename = $row['st_type_name'];
-                                                 $acctype_id = $row['st_type_id'];   
+                                                 $firstn = $row['fname'];
+                                                 $secondn = $row['mname'];
+                                                 $thirdn = $row['lname'];
+                                                 $acctypename =  $firstn. ' '. $secondn.' '. $thirdn;
+                                                 $acctype_id = $row['useraccountID'];   
                                             
                                           ?>
                                           <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
@@ -339,20 +354,36 @@ include 'INCLUDES/userdetails.php';
                                         </select>
                                   </div>
                                   <div class="form-group">
-                                    <label>New Stakeholder</label>
-                                    <input type="text" required class="form-control" name="fname" id="st_name">
-                                  </div>
-                                  <div class="form-group">
                                     <label>Address</label>
-                                    <input type="text" required class="form-control form-control-sm" name="mname" id="st_address">
+                                    <input type="text" required class="form-control form-control-sm" name="mname" id="inv_address">
                                   </div>
                                   <div class="form-group">
                                     <label>Contact #</label>
-                                    <input type="text" required class="form-control form-control-sm" name="lname" id="st_contact">
+                                    <input type="text" required class="form-control form-control-sm" name="lname" id="inv_contact">
                                   </div>
+
                                   <div class="form-group">
                                     <label>Percent %</label>
-                                    <input type="number" required class="form-control form-control-sm" name="lname" id="st_percent">
+                                    <input type="number" required class="form-control form-control-sm" name="lname" id="inv_percent">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Project/PO Number</label>
+                                        <select class="form-control" name="userrole" id="getselpoinv">
+                                        <option value="" disabled selected="">Select PO number</option>
+                                          <?php 
+                                            $selectacctype = "SELECT * FROM `jamsfms_r_sales ";
+
+                                            $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
+                                            while($row = mysqli_fetch_assoc($selectresult)){
+                                                 $acctypename = $row['po_num'];
+                                                 $acctype_id = $row['so_id'];   
+                                            
+                                          ?>
+                                          <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
+                                          <?php 
+                                            }
+                                          ?>
+                                        </select>
                                   </div>
 
                                   <!--<div class="form-group">
@@ -366,7 +397,94 @@ include 'INCLUDES/userdetails.php';
 										</div>
 										<div class="modal-footer">
 											<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
-											<button type="submit" id="submit" class="btn btn-primary">Save changes</button>
+											<button type="submit" id="submit_inv" class="btn btn-primary">Save changes</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="modal fade" id="modal-dialog2">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h4 class="modal-title">Add New Shareholder</h4>
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										</div>
+										<div class="modal-body">
+											<div class="widget-content padding">
+                                
+                                     <div class="form-group">
+                                    <input type="hidden" name="" id="shr_id" value="00000002">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Shareholder Name</label>
+                                    <input type="text" required class="form-control" name="fname" id="shr_name">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Link User Account</label>
+                                        <select class="form-control" name="userrole" id="getselacc2">
+                                        <option value="" disabled selected="">Link User Account</option>
+                                          <?php 
+                                            $selectacctype = "SELECT a.fname, a.mname, a.lname, a.useraccountID from jamfms_r_useraccount as a 
+																inner join jamfms_r_accounttype as b
+																on b.acctypeid = a.acctype_fk
+																where b.acctype_name = 'Shareholder'";
+
+                                            $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
+                                            while($row = mysqli_fetch_assoc($selectresult)){
+                                                 $firstn = $row['fname'];
+                                                 $secondn = $row['mname'];
+                                                 $thirdn = $row['lname'];
+                                                 $acctypename =  $firstn. ' '. $secondn.' '. $thirdn;
+                                                 $acctype_id = $row['useraccountID'];   
+                                            
+                                          ?>
+                                          <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
+                                          <?php 
+                                            }
+                                          ?>
+                                        </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Address</label>
+                                    <input type="text" required class="form-control form-control-sm" name="mname" id="shr_address">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Contact #</label>
+                                    <input type="text" required class="form-control form-control-sm" name="lname" id="shr_contact">
+                                  </div>
+                                  <div class="form-group">
+                                    <label>Project/PO Number</label>
+                                        <select class="form-control" name="userrole" id="getselposhr">
+                                        <option value="" disabled selected="">Select PO number</option>
+                                          <?php 
+                                            $selectacctype = "SELECT * FROM `jamsfms_r_sales ";
+
+                                            $selectresult = mysqli_query($connect, $selectacctype) or die("Bad Query: $sql");
+                                            while($row = mysqli_fetch_assoc($selectresult)){
+                                                 $acctypename = $row['po_num'];
+                                                 $acctype_id = $row['so_id'];   
+                                            
+                                          ?>
+                                          <option value="<?php  echo $acctype_id ?>"><?php echo "$acctypename"; ?></option>
+                                          <?php 
+                                            }
+                                          ?>
+                                        </select>
+                                  </div>
+
+                                  <!--<div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" class="form-control" name="username">
+                                  </div> -->
+                                  
+                                  <!--<button type="submit" class="btn btn-primary">Submit</button>
+                               -->
+                            </div>
+										</div>
+										<div class="modal-footer">
+											<a href="javascript:;" class="btn btn-white" data-dismiss="modal">Close</a>
+											<button type="submit" id="submit_shr" class="btn btn-primary">Save changes</button>
 										</div>
 									</div>
 								</div>
@@ -551,26 +669,44 @@ include 'INCLUDES/userdetails.php';
 
 	<!-- ================== END PAGE LEVEL JS ================== -->
 	<script type="text/javascript">
-        $('#submit').click(function(e){
+        $('#submit_inv').click(function(e){
             e.preventDefault();
 
             
-            var e = document.getElementById('getsel');
-            var get = e.options[e.selectedIndex].value;
-            var st_name = document.getElementById('st_name').value;
-            var st_address = document.getElementById('st_address').value;
-            var st_contact = document.getElementById('st_contact').value;
-            var st_percent = document.getElementById('st_percent').value;
+            //var e = document.getElementById('getsel');
+            //var get = e.options[e.selectedIndex].value;
+            var f = document.getElementById('getselpoinv');
+            var get2 = f.options[f.selectedIndex].value;
+            var g = document.getElementById('getselacc');
+            var get3 = g.options[g.selectedIndex].value;
+            var inv_name = document.getElementById('inv_name').value;
+            var inv_address = document.getElementById('inv_address').value;
+            var inv_contact = document.getElementById('inv_contact').value;
+            var inv_percent = document.getElementById('inv_percent').value;
+            var inv_id = document.getElementById('inv_id').value;
 
           
-            if (get == "")
+
+            if (get2 == "")
             {
-                if (document.getElementById('getsel').options[e.selectedIndex].value == '')
+                if (document.getElementById('getselpoinv').options[f.selectedIndex].value == '')
                 {
-                    document.getElementById('getsel').options[0].innerText = "Please select";
-                    document.getElementById('getsel').focus();
-                    document.getElementById('getsel').style.borderColor = "#B94A48";
-                    document.getElementById('getsel').style.color = "#B94A48";
+                    document.getElementById('getselpoinv').options[0].innerText = "Please select";
+                    document.getElementById('getselpoinv').focus();
+                    document.getElementById('getselpoinv').style.borderColor = "#B94A48";
+                    document.getElementById('getselpoinv').style.color = "#B94A48";
+                }
+
+
+            }
+            if (get3 == "")
+            {
+                if (document.getElementById('getselacc').options[g.selectedIndex].value == '')
+                {
+                    document.getElementById('getselacc').options[0].innerText = "Please select";
+                    document.getElementById('getselacc').focus();
+                    document.getElementById('getselacc').style.borderColor = "#B94A48";
+                    document.getElementById('getselacc').style.color = "#B94A48";
                 }
 
 
@@ -579,7 +715,7 @@ include 'INCLUDES/userdetails.php';
             else
             {
                 swal({
-                        title: "Add new stakeholder??",
+                        title: "Add new investor??",
                         text: "New stakeholder details will be stored in the database.",
                         type: "warning",
                         showCancelButton: true,
@@ -600,11 +736,124 @@ include 'INCLUDES/userdetails.php';
                                     url: 'INCLUDES/createstkh.php',
                                     async: false,
                                     data: {
-                                        _st_percent: st_percent,
-                                        _st_contact: st_contact,
-                                        _st_address: st_address,
-                                        _st_name: st_name,
-                                        _st_cat: get
+                                        _st_percent: inv_percent,
+                                        _st_contact: inv_contact,
+                                        _st_address: inv_address,
+                                        _st_name: inv_name,
+                                        _st_cat: inv_id,
+                                        _st_po: get2,
+                                        _st_acc: get3
+                                    },
+                                    success: function(data) {
+                                        
+
+                                        swal("Stakeholder is added successfully! ", "Entries are saved.", "success");
+                                        
+                                        setTimeout(function() 
+                                        {
+                                            window.location = 'fo-dashboard.php';
+                                           // document.getElementById('add-regular').click();
+                                        },3000);
+                                    },
+                                    error: function(data) {
+                                       
+                                        swal("Error", "Something is wrong.", "error");
+                                    }
+
+                                }); 
+
+                        
+                            	
+   		 			
+                    
+
+                    } 
+                    else
+                    {
+                        swal("Cancelled", "Transaction did not proceed.", "error");
+                    }
+                });
+                
+             }
+
+
+        });
+    </script>
+    <script type="text/javascript">
+        $('#submit_shr').click(function(e){
+            e.preventDefault();
+
+            
+            //var e = document.getElementById('getsel');
+            //var get = e.options[e.selectedIndex].value;
+            var f = document.getElementById('getselposhr');
+            var get2 = f.options[f.selectedIndex].value;
+            var g = document.getElementById('getselacc2');
+            var get3 = g.options[g.selectedIndex].value;
+            var inv_name = document.getElementById('shr_name').value;
+            var inv_address = document.getElementById('shr_address').value;
+            var inv_contact = document.getElementById('shr_contact').value;
+            var inv_id = document.getElementById('shr_id').value;
+            var inv_percent = 0;
+
+          
+
+            if (get2 == "")
+            {
+                if (document.getElementById('getselposhr').options[f.selectedIndex].value == '')
+                {
+                    document.getElementById('getselposhr').options[0].innerText = "Please select";
+                    document.getElementById('getselposhr').focus();
+                    document.getElementById('getselposhr').style.borderColor = "#B94A48";
+                    document.getElementById('getselposhr').style.color = "#B94A48";
+                }
+
+
+            }
+            if (get3 == "")
+            {
+                if (document.getElementById('getselacc2').options[g.selectedIndex].value == '')
+                {
+                    document.getElementById('getselacc2').options[0].innerText = "Please select";
+                    document.getElementById('getselacc2').focus();
+                    document.getElementById('getselacc2').style.borderColor = "#B94A48";
+                    document.getElementById('getselacc2').style.color = "#B94A48";
+                }
+
+
+            }
+
+            else
+            {
+                swal({
+                        title: "Add new shareholder?",
+                        text: "New stakeholder details will be stored in the database.",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#b05544',
+                        confirmButtonText: 'Yes',
+                        cancelButtonText: "No",
+                        closeOnConfirm: false,
+                        closeOnCancel: false,
+
+                },
+                function(isConfirm){
+                    if (isConfirm) {
+                    	 
+
+                      
+                        $.ajax({
+                                    type: 'POST',
+                                    url: 'INCLUDES/createstkh.php',
+                                    async: false,
+                                    data: {
+                                        _st_percent: inv_percent,
+                                        _st_contact: inv_contact,
+                                        _st_address: inv_address,
+                                        _st_name: inv_name,
+                                        _st_cat: inv_id,
+                                        _st_po: get2,
+                                        _st_acc: get3
                                     },
                                     success: function(data) {
                                         
@@ -678,6 +927,14 @@ include 'INCLUDES/userdetails.php';
 					
 					
 			}
+			
+
+        });
+    </script>
+    <script type="text/javascript">
+        $('select[id=getsel]').change(function(e){
+            e.preventDefault(); 
+
 			
 
         });

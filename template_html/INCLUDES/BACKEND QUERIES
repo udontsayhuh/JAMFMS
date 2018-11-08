@@ -23,7 +23,9 @@ stkhid int(8) zerofill PRIMARY KEY AUTO_INCREMENT not null,
     stkh_percent numeric(10,2) not null,
     stkh_status bit not null DEFAULT 0,
     fk_st_type_id int(8) unsigned ZEROFILL not null,
-    foreign key (fk_st_type_id) REFERENCES jamsfms_r_stakeholder_type(st_type_id)
+    foreign key (fk_st_type_id) REFERENCES jamsfms_r_stakeholder_type(st_type_id),
+    fk_so_id int(8) unsigned ZEROFILL not null,
+    foreign key (fk_so_id) REFERENCES jamsfms_r_stakeholder_type(st_type_id)
     
 )
 

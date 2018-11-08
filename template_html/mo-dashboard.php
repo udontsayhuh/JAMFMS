@@ -210,6 +210,8 @@ include 'INCLUDES/userdetails.php';
 				</div>
 				<!-- end col-3 -->
 			</div>
+		
+			<div id="container"></div>
 
 					
 				</div>
@@ -382,6 +384,120 @@ include 'INCLUDES/userdetails.php';
 	<script src="../assets/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 	<script src="../assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="../assets/js/demo/dashboard.min.js"></script>
+	<script src="../assets/hcharts/highcharts.js"></script>
+	<script src="../assets/hcharts/modules/series-label.js"></script>
+	<script src="../assets/hcharts/modules/exporting.js"></script>
+	<script src="../assets/hcharts/modules/export-data.js"></script>
+	<script src="../assets/hcharts/modules/data.js"></script>
+	<script src="../assets/hcharts/modules/drilldown.js"></script>
+	
+
+<script type="text/javascript">
+
+// Create the chart
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Product Chart'
+    },
+    subtitle: {
+        text: 'Click the specific product category to reveal the product assign to it.'
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            text: 'Total'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f}'
+            }
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+    },
+
+    "series": [
+        {
+            "name": "Product Category",
+            "colorByPoint": true,
+            "data": [
+               <?php 
+               $tablesql = "SELECT * FROM `jamsfms_r_prod_category`";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+                ?> 
+ 				{
+                    "name": "<?php echo $row['prod_cat_name']?>",
+                    "y": 
+                    	 <?php 
+			               $tablesql1 = "SELECT COALESCE(SUM(so_qty),0) qtt FROM jamsfms_r_sales jrs
+							inner join jamsfms_r_product jrp on jrs.fk_prod_id = jrp.prod_id
+							inner join jamsfms_r_prod_category jrpc on jrp.fk_prodcat = jrpc.prod_cat_id
+							where jrpc.prod_cat_id = '$row[prod_cat_id]'";
+			                $tableresult1 = mysqli_query($connect, $tablesql1) or die(mysqli_error($connect)); 
+			 				while ($row1 = mysqli_fetch_assoc($tableresult1)) {
+			               ?> 
+			               
+			               	<?php echo $row1['qtt'] ?>,
+
+			               <?php }?> 
+                    "drilldown": "<?php echo $row['prod_cat_name']?>"
+                },
+                <?php } ?>
+               
+            ]
+        }
+    ],
+    "drilldown": {
+        "series": [
+
+            <?php 
+               $tablesql = "SELECT * FROM `jamsfms_r_prod_category`";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+            ?>
+             {	
+                "name": "<?php echo $row['prod_cat_name']?>",
+            	"colorByPoint": true,
+                "id": "<?php echo $row['prod_cat_name']?>",
+                "data": [
+					<?php 
+				               $tablesql1 = "SELECT * FROM jamsfms_r_sales JRS INNER JOIN jamsfms_r_product JRP ON JRS.fk_prod_id = JRP.prod_id WHERE fk_prodcat = 
+				               '$row[prod_cat_id]'";
+				                $tableresult1 = mysqli_query($connect, $tablesql1) or die(mysqli_error($connect)); 
+				 				while ($row1 = mysqli_fetch_assoc($tableresult1)) {
+				     ?>
+		                        [
+		                        "<?php echo $row1['prod_name'].'-'.$row1['po_num']?>",
+		                        <?php echo $row1['so_qty']?>
+		                        ],
+                        <?php } ?>
+                ]
+            },
+
+            <?php }?> 
+        ]
+    }
+});
+		</script>
 	<script>
 		$(document).ready(function() {
 			App.init();

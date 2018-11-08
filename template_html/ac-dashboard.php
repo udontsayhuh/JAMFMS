@@ -160,8 +160,14 @@ include 'INCLUDES/userdetails.php';
 					<div class="widget widget-stats bg-orange">
 						<div class="stats-icon"><i class="fa fa-link"></i></div>
 						<div class="stats-info">
-							<h4>BOUNCE RATE</h4>
-							<p>20.44%</p>	
+							<?php $selectcount = "SELECT COUNT(*) as count from jamsfms_r_customer";
+                                    $countresult = mysqli_query($connect, $selectcount) or die('Bad query: $sql'); 
+
+                                    while ($row = mysqli_fetch_assoc($countresult) ) {
+                                        $count = $row['count'];
+                                    } ?>
+							<h4>TOTAL NUMBER OF CUSTOMERS</h4>
+							<p><?php echo $count?></p>	
 						</div>
 						<div class="stats-link">
 							<a href="javascript:;">View Detail <i class="fa fa-arrow-alt-circle-right"></i></a>
@@ -174,8 +180,14 @@ include 'INCLUDES/userdetails.php';
 					<div class="widget widget-stats bg-grey-darker">
 						<div class="stats-icon"><i class="fa fa-users"></i></div>
 						<div class="stats-info">
-							<h4>UNIQUE VISITORS</h4>
-							<p>1,291,922</p>	
+							<?php $selectcount = "SELECT COUNT(*) as count from jamsfms_r_product";
+                                    $countresult = mysqli_query($connect, $selectcount) or die('Bad query: $sql'); 
+
+                                    while ($row = mysqli_fetch_assoc($countresult) ) {
+                                        $count = $row['count'];
+                                    } ?>
+							<h4>TOTAL NUMBER OF PRODUCTS</h4>
+							<p><?php echo $count?></p>		
 						</div>
 						<div class="stats-link">
 							<a href="javascript:;">View Detail <i class="fa fa-arrow-alt-circle-right"></i></a>
@@ -188,8 +200,14 @@ include 'INCLUDES/userdetails.php';
 					<div class="widget widget-stats bg-black-lighter">
 						<div class="stats-icon"><i class="fa fa-clock"></i></div>
 						<div class="stats-info">
-							<h4>AVG TIME ON SITE</h4>
-							<p>00:12:23</p>	
+							<?php $selectcount = "SELECT COUNT(*) as count from jamsfms_r_stakeholder where fk_st_type_id = 00000001";
+                                    $countresult = mysqli_query($connect, $selectcount) or die('Bad query: $sql'); 
+
+                                    while ($row = mysqli_fetch_assoc($countresult) ) {
+                                        $count = $row['count'];
+                                    } ?>
+							<h4>TOTAL NUMBER OF CUSTOMERS</h4>
+							<p><?php echo $count?></p>	
 						</div>
 						<div class="stats-link">
 							<a href="javascript:;">View Detail <i class="fa fa-arrow-alt-circle-right"></i></a>
@@ -199,7 +217,7 @@ include 'INCLUDES/userdetails.php';
 				<!-- end col-3 -->
 			</div>
 
-					
+					<div id="container"></div>
 				</div>
 				<!-- end col-8 -->
 				<!-- begin col-4 -->
@@ -313,6 +331,120 @@ include 'INCLUDES/userdetails.php';
 	<script src="../assets/plugins/jquery-jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 	<script src="../assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
 	<script src="../assets/js/demo/dashboard.min.js"></script>
+	<script src="../assets/hcharts/highcharts.js"></script>
+	<script src="../assets/hcharts/modules/series-label.js"></script>
+	<script src="../assets/hcharts/modules/exporting.js"></script>
+	<script src="../assets/hcharts/modules/export-data.js"></script>
+	<script src="../assets/hcharts/modules/data.js"></script>
+	<script src="../assets/hcharts/modules/drilldown.js"></script>
+	
+
+<script type="text/javascript">
+
+// Create the chart
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Sales Chart'
+    },
+    subtitle: {
+        text: 'By Year.'
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            text: 'Total'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f}'
+            }
+        }
+    },
+
+    tooltip: {
+        headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+        pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b> of total<br/>'
+    },
+
+    "series": [
+        {
+            "name": "Annual Sales",
+            "colorByPoint": true,
+            "data": [
+               <?php 
+               $tablesql = "SELECT year(created_at) as createddate  FROM `jamsfms_r_sales`";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+ 					$year = $row['createddate'];
+                ?> 
+ 				{
+                    "name": "<?php echo $year;?>",
+                    "y": 
+                    	 <?php 
+			               $tablesql1 = "SELECT COALESCE(SUM(prod_poamount),0) qtt FROM jamsfms_r_sales where year(created_at) = '$year'";
+			                $tableresult1 = mysqli_query($connect, $tablesql1) or die(mysqli_error($connect)); 
+			 				while ($row1 = mysqli_fetch_assoc($tableresult1)) {
+			               ?> 
+			               
+			               	<?php echo $row1['qtt'] ?>,
+
+			               <?php }?> 
+                    "drilldown": "<?php echo $year;?>"
+                },
+                <?php } ?>
+               
+            ]
+        }
+    ],
+    "drilldown": {
+        "series": [
+
+            <?php 
+               $tablesql = "SELECT year(created_at) as createddate, date_format(created_at, '%M') as month  FROM `jamsfms_r_sales`";
+                $tableresult = mysqli_query($connect, $tablesql) or die(mysqli_error($connect));
+
+ 				while ($row = mysqli_fetch_assoc($tableresult)) {
+ 					$year = $row['createddate'];
+ 					$month = $row['month'];
+            ?>
+             {
+                "name": "<?php echo $year;?>",
+            	"colorByPoint": true,
+                "id": "<?php echo $year;?>",
+                "data": [
+					<?php 
+				               $tablesql2 = "SELECT year(created_at) as createddate, date_format(created_at, '%M') as month, prod_poamount as sum, date_format(created_at, '%M') as mo  FROM `jamsfms_r_sales` where year(created_at) = '$year'";
+				                $tableresult2 = mysqli_query($connect, $tablesql2) or die(mysqli_error($connect)); 
+				 				while ($row = mysqli_fetch_assoc($tableresult2)) {
+				     ?>
+		                        [
+		                        "<?php echo $row['mo'].'-'.$row['sum']?>",
+		                        <?php echo $row['sum']?>
+		                        ],
+                        <?php } ?>
+                ]
+            },
+
+            <?php }?> 
+        ]
+    }
+    
+});
+		</script>
 	<script>
 		$(document).ready(function() {
 			App.init();

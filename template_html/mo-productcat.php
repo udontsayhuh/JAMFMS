@@ -636,7 +636,7 @@ include 'INCLUDES/userdetails.php';
                                         
                                         setTimeout(function() 
                                         {
-                                            window.location = 'mo-productcat.php';
+                                            //window.location = 'mo-productcat.php';
                                             document.getElementById('add-regular').click();
                                         },3000);
                                     },

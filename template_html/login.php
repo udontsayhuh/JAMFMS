@@ -58,11 +58,11 @@ $transtype = $_POST['transtype'];
         }
         elseif ($role == 6) {
         $_SESSION['username'] = $username;
-        header('Location: inv-home.php');
+        header('Location: inv-dashboard.php');
         }
         elseif ($role == 7) {
         $_SESSION['username'] = $username;
-        header('Location: stk-home.php');
+        header('Location: shareholder-inquiry.php');
         }
         $insert = "INSERT INTO `audit_trail`( `userid`, `transtype`, `transdatetime`) VALUES ($uid, '$transtype', CURRENT_TIMESTAMP)";
         
@@ -108,13 +108,14 @@ $transtype = $_POST['transtype'];
 	    <!-- begin login -->
         <div class="login bg-black animated fadeInDown">
             <!-- begin brand -->
-            <div class="login-header">
+            <div class="login-header" style="margin-top: -70px; margin-left: -240px;">
                 <div class="brand">
-                    <span class="logo"></span> <b>Color</b> Admin
-                    <small>responsive bootstrap 3 admin template</small>
+                    <img src="../assets/img/logo/jamslogin.png" style="width: 200px; height: 200px; "> <b>JAMS FMS</b> 
+                    
+
                 </div>
                 <div class="icon">
-                    <i class="fa fa-lock"></i>
+                    
                 </div>
             </div>
             <!-- end brand -->
